@@ -1,6 +1,6 @@
 {
   "name": "minemap-tools",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "keywords": [
@@ -15,14 +15,15 @@
     "build": "vue-cli-service build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-    "core-js": "^3.6.4",
-    "minemap-view": "^1.0.2",
-    "vue": "^2.6.11"
-  },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.2.0",
     "@vue/cli-service": "~4.2.0",
+    "ant-design-vue": "^1.4.10",
+    "babel-plugin-component": "^1.1.1",
+    "core-js": "^3.6.4",
+    "element-ui": "^2.13.0",
+    "minemap-view": "^1.0.2",
+    "vue": "^2.6.11",
     "vue-template-compiler": "^2.6.11"
   },
   "browserslist": [
