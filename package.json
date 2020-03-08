@@ -1,0 +1,32 @@
+{
+  "name": "minemap-tools",
+  "version": "1.0.1",
+  "description": "",
+  "main": "index.js",
+  "keywords": [
+    "minemap",
+    "map",
+    "tools"
+  ],
+  "author": "helihuo",
+  "license": "ISC",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "core-js": "^3.6.4",
+    "minemap-view": "^1.0.2",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.2.0",
+    "@vue/cli-service": "~4.2.0",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}
