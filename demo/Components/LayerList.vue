@@ -1,5 +1,5 @@
 <template>
-  <div class="layer-list">
+  <div>
     <a-table :columns="columns"
              style="margin-top: 8px;"
              :dataSource="layerList"
@@ -88,10 +88,5 @@
 </script>
 
 <style scoped>
-  .layer-list {
-    position: absolute;
-    width: 320px;
-    top: 20px;
-    right: 10px;
-  }
+
 </style>

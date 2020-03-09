@@ -1,30 +1,44 @@
 <template>
   <div id="app">
     <MapView v-bind="mapConfig" @completed="mapLoad"></MapView>
+    <app-menu class="menu" @menu-change="menuChange"></app-menu>
     <a-drawer
-        title="地图功能"
-        placement="left"
-        :width="360"
-        :bodyStyle="{
-          padding:'0 16px 16px'
-        }"
-        :closable="false"
+        title="圆点图层"
+        :placement="drawerPlacement"
+        :width="drawerWidth"
+        @close="onDrawerClose"
         :mask="false"
-        :visible="this.map!=undefined">
-      <a-tabs
-          defaultActiveKey="point" size="small">
-        <a-tab-pane tab="点图层" key="point">
-          <point-layers :map="map"></point-layers>
-        </a-tab-pane>
-        <a-tab-pane tab="线图层" key="line">
-          <line-layers :map="map"></line-layers>
-        </a-tab-pane>
-        <a-tab-pane tab="面图层" key="polygon">
-          <polygon-layer :map="map"></polygon-layer>
-        </a-tab-pane>
-      </a-tabs>
+        :visible="menu=='layer:circle'">
+      <point-layers :map="map"></point-layers>
     </a-drawer>
-    <layer-list :map="map"></layer-list>
+    <a-drawer
+        title="符号图层"
+        :placement="drawerPlacement"
+        :width="drawerWidth"
+        @close="onDrawerClose"
+        :mask="false"
+        :visible="menu=='layer:symbol'">
+      <div>111</div>
+    </a-drawer>
+    <a-drawer
+        title="线图层"
+        :placement="drawerPlacement"
+        :width="drawerWidth"
+        @close="onDrawerClose"
+        :mask="false"
+        :visible="menu=='layer:line'">
+      <line-layers :map="map"></line-layers>
+    </a-drawer>
+    <a-drawer
+        title="面图层"
+        :placement="drawerPlacement"
+        :width="drawerWidth"
+        @close="onDrawerClose"
+        :mask="false"
+        :visible="menu=='layer:fill'">
+      <polygon-layer :map="map"></polygon-layer>
+    </a-drawer>
+    <layer-list :map="map" v-show="false" class="layer-list"></layer-list>
   </div>
 </template>
 
@@ -33,13 +47,17 @@
   import PointLayers from "./Components/PointLayers";
   import LayerList from "./Components/LayerList";
   import PolygonLayer from "./Components/PolygonLayer";
+  import AppMenu from "./Components/AppMenu";
 
   export default {
     name: "App",
-    components: {PolygonLayer, LayerList, PointLayers, LineLayers},
+    components: {AppMenu, PolygonLayer, LayerList, PointLayers, LineLayers},
     data() {
       return {
         map: undefined,
+        menu: null,
+        drawerWidth: 360,
+        drawerPlacement: 'right'
       }
     },
     computed: {
@@ -51,11 +69,20 @@
       mapLoad(map) {
         this.map = map;
       },
+      menuChange(menu) {
+        this.menu = menu;
+      },
+      onDrawerClose(){
+        this.menu=null;
+      }
+    },
+    beforeDestroy() {
+
     }
   }
 </script>
 
-<style>
+<style scoped lang="scss">
   html, body {
     margin: 0;
     padding: 0;
@@ -67,14 +94,38 @@
     height: 100vh;
   }
 
+  .menu {
+    position: absolute;
+    /*left: 0;*/
+    height: 100vh;
+    width: 200px;
+
+    > /deep/ ul {
+      height: 100%;
+    }
+
+    & /deep/ .ant-menu-inline-collapsed {
+      width: 40px;
+    }
+
+    & /deep/ .ant-menu-inline-collapsed > .ant-menu-item,
+    & /deep/ .ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title
+    {
+      padding: 0 10px !important;
+    }
+  }
+
+  .layer-list {
+    position: absolute;
+    width: 320px;
+    top: 80px;
+    right: 10px;
+  }
+
   .d-symmetry {
     display: flex;
     align-items: center;
     justify-content: space-around;
   }
 
-  .ant-row,
-  .ant-row-flex {
-    margin: 4px 0 !important;
-  }
 </style>

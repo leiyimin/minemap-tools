@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import App from './App.vue'
-import Antd from 'ant-design-vue'
-import 'ant-design-vue/dist/antd.css'
 import { ColorPicker } from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import Antd from 'ant-design-vue'
+import 'ant-design-vue/dist/antd.css'
 import MapView from 'minemap-view'
 import 'minemap-view/lib/index.css'
 
