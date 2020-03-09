@@ -1,4 +1,5 @@
 import baseTools from "./base";
+import {getGeoJsonFromSourceData} from "./dataTools";
 
 /**
  * 添加点图层
@@ -158,7 +159,17 @@ const createPolygonLayer = function (map, sourceId, layerId, coordinatesArr, opt
 const addPolygons = function (n) {
   console.log('这是mapTools!' + n);
 };
-
+const addLayer = function (map, dataParams, layerOption) {
+  if (!map) return '地图不存在';
+  let [sourceId, layerId] = [layerOption.source, layerOption.id];
+  removeLayer(map, layerId);
+  removeSource(map, sourceId);
+  let geoJson = getGeoJsonFromSourceData(dataParams);
+  // let defaultLayerOption = constant.defaultLayerOption[layerType];
+  // layerOption = Object.assign(defaultLayerOption, layerOption);
+  map.addSource(sourceId, geoJson);
+  map.addLayer(layerOption);
+};
 const addMarker = function () {
 
 };
@@ -190,6 +201,7 @@ const removeSource = function (map, sourceId) {
 
 
 export default {
+  addLayer,
   createPointLayer,
   addPoints,
   createLineLayer,

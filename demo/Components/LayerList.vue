@@ -4,6 +4,7 @@
              style="margin-top: 8px;"
              :dataSource="layerList"
              :scroll="{ y: 460 }"
+             :rowKey="record=>record.layerId"
              :pagination="false" size="small">
       <label slot="name" slot-scope="text, record"
              :style="{color:record.color,'font-weight':'bold'}">

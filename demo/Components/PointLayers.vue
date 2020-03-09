@@ -4,8 +4,8 @@
       <a-col>
         <label style="padding-right: 12px;">点的半径</label>
         <a-input-number
-                 v-model="option.paint['circle-radius']"
-                 :min="5" :max="99"></a-input-number>
+            v-model="option.paint['circle-radius']"
+            :min="5" :max="99"></a-input-number>
       </a-col>
       <a-col>
         <a-row type="flex" align="middle" :gutter="12">
@@ -37,28 +37,42 @@
 
 <script>
   import mapTools from "../../index";
+  import {getPointObjs} from "../js/public";
+  import constant from "../../library/constant";
 
   export default {
     name: "PointLayers",
     props: ["map"],
     data() {
       return {
-        count: 3,
+        count: 2,
         option: {
+          "type": constant.layerType.CIRCLE,
           "paint": {
             'circle-radius': 15,
             'circle-color': "#ff0000"
           }
-        }
+        },
       }
     },
     methods: {
       addPointLayer() {
         let now = new Date().getTime();
         let [sourceId, layerId] =
-            ['source_point_' + now, 'layer_point_' + now];
-        let err = mapTools.createPointLayer(this.map, sourceId, layerId,
-            this.getPointCoordinates(this.map.getCenter(), this.count || 3), this.option);
+          ['source_point_' + now, 'layer_point_' + now];
+        // let err = mapTools.createPointLayer(this.map, sourceId, layerId,
+        //   this.getPointCoordinates(this.map.getCenter(), this.count || 3), this.option);
+        let option = Object.assign({
+          id: layerId,
+          source: sourceId,
+          filter: ['>', 'index', 1]
+        }, this.option);
+        let data = getPointObjs(this.map.getCenter(), this.count);
+        let coordinateFieldName = 'coordinates';
+        let geometryType = constant.geometryType.POINT;
+        let properties = [];
+        let err = mapTools.addLayer(this.map,
+          {data, coordinateFieldName, geometryType, properties}, option);
         if (err) {
           this.$message.error("错误：" + err);
           return;
