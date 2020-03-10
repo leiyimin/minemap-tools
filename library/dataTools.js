@@ -1,4 +1,4 @@
-import constant from "./constant";
+ import constant from "./constant";
 import myClass from "./myClass";
 
 /**
@@ -26,24 +26,11 @@ export const getFeatures = function (params) {
   });
   return features;
 };
-/**
- *
- * @param dataObj (Object required)
- *        数据对象
- * @param type (String required)
- *        要素类型
- * @param coordinateFieldName (String required)
- *        数据对象中坐标字段名称
- * @param properties (Array)
- *        要拷贝到feature的属性名集合,
- *        空数组代表拷贝所有属性,
- *        不传默认不拷贝属性.
- * @return {} & {geometry: {coordinates: undefined, type: undefined}, type: string, properties: {}}
- */
+
 export const getFeature = function (params) {
   let dataObj = params.data;
   let type = params.geometryType;
-  let coordinateFieldName = params.coordinateFieldName;
+  let coordinateFieldName = params.coordinateFieldName||'coordinates';
   let properties = params.properties;
   const geometryType = constant.geometryType;
   // let feature = Object.assign({}, constant.featureTemplate);
@@ -81,7 +68,7 @@ export const getFeature = function (params) {
     return '坐标数据类型错误';
   }
   //处理properties
-  if (properties) {
+  if (!properties||properties.length>0) {
     let prop = {};
     if (properties.length > 0) {
       properties.forEach(key => {
@@ -163,7 +150,7 @@ export const polygonStringToArray = function (polygonString) {
     return e;
   }
 };
-export const getGeoJsonFromSourceData = function (params) {
+export const getGeoJsonFromUntreatedData = function (params) {
   let data;
   let source = params.data;
   if (source instanceof Array) {
@@ -191,7 +178,7 @@ export default {
   getFeatures,
   getGeoJsonByFeature,
   getGeoJsonByFeatures,
-  getGeoJsonFromSourceData,
+  getGeoJsonFromUntreatedData,
   pointStringToArray,
   lineStringToArray,
   polygonStringToArray

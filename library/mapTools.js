@@ -1,6 +1,8 @@
 import baseTools from "./base";
-import {getGeoJsonFromSourceData} from "./dataTools";
+import {getGeoJsonFromUntreatedData} from "./dataTools";
+import constant from "./constant";
 
+const error = constant.error;
 /**
  * 添加点图层
  * @param map
@@ -159,19 +161,43 @@ const createPolygonLayer = function (map, sourceId, layerId, coordinatesArr, opt
 const addPolygons = function (n) {
   console.log('这是mapTools!' + n);
 };
-const addLayer = function (map, dataParams, layerOption) {
-  if (!map) return '地图不存在';
-  let [sourceId, layerId] = [layerOption.source, layerOption.id];
+/**
+ *
+ * @param map
+ * @param dataParams
+ * Object 有四个属性
+ * ｛
+ *   data:Object|Array 数据源，单个或数组,必须包含坐标属性
+ *   coordinateFieldName:String 数据对象中存放坐标的属性名,非必选，默认为'coordinates’
+ *   geometryType:String 图形类型，参考常量中的值
+ *   properties:Array 指定要拷贝到geometry中的属性，非必选，默认拷贝全部，[]代表不拷贝
+ * ｝
+ * @param layerOptions 图层配置项，参考minemap api文档
+ * @returns {string} 错误信息
+ */
+export const addLayerWithUntreatedData = function (map, dataParams, layerOptions) {
+  if (!map) return error.NO_MAP;
+  let geoJson = getGeoJsonFromUntreatedData(dataParams);
+  if (typeof geoJson === 'string') {
+    return geoJson;
+  }
+  addLayer(map, geoJson, layerOptions);
+};
+export const addLayer = function (map, geoJson, layerOptions) {
+  if (!map) return error.NO_MAP;
+  let [sourceId, layerId] = [layerOptions.source, layerOptions.id];
   removeLayer(map, layerId);
   removeSource(map, sourceId);
-  let geoJson = getGeoJsonFromSourceData(dataParams);
-  // let defaultLayerOption = constant.defaultLayerOption[layerType];
-  // layerOption = Object.assign(defaultLayerOption, layerOption);
   map.addSource(sourceId, geoJson);
-  map.addLayer(layerOption);
+  map.addLayer(layerOptions);
 };
-const addMarker = function () {
+const addSimpleMarker = function (map, point, icon, options) {
+  let op = {map: map, position: point, icon: icon};
+  return new minemap.Marker(Object.assign(op, options || {})).addTo(map);
 
+};
+const addCustomMarker = function (map, point, el, options) {
+  return new minemap.Marker(el, options || {}).setLngLat(point).addTo(map);
 };
 
 const addPopup = function () {
@@ -201,6 +227,7 @@ const removeSource = function (map, sourceId) {
 
 
 export default {
+  addLayerWithUntreatedData,
   addLayer,
   createPointLayer,
   addPoints,
@@ -208,7 +235,8 @@ export default {
   addLines,
   createPolygonLayer,
   addPolygons,
-  addMarker,
+  addSimpleMarker,
+  addCustomMarker,
   addPopup,
   setLayerVisible,
   removeLayer,

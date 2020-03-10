@@ -38,20 +38,30 @@
         :visible="menu=='layer:fill'">
       <polygon-layer :map="map"></polygon-layer>
     </a-drawer>
+    <a-drawer
+        title="api文档"
+        :placement="drawerPlacement"
+        :width="820"
+        @close="onDrawerClose"
+        :mask="false"
+        :visible="menu=='api'">
+      <api-document></api-document>
+    </a-drawer>
     <layer-list :map="map" v-show="false" class="layer-list"></layer-list>
   </div>
 </template>
 
 <script>
-  import LineLayers from "./Components/LineLayers";
-  import PointLayers from "./Components/PointLayers";
-  import LayerList from "./Components/LayerList";
-  import PolygonLayer from "./Components/PolygonLayer";
-  import AppMenu from "./Components/AppMenu";
+  import LineLayers from "./components/LineLayers";
+  import PointLayers from "./components/PointLayers";
+  import LayerList from "./components/LayerList";
+  import PolygonLayer from "./components/PolygonLayer";
+  import AppMenu from "./components/AppMenu";
+  import ApiDocument from "./components/ApiDocument";
 
   export default {
     name: "App",
-    components: {AppMenu, PolygonLayer, LayerList, PointLayers, LineLayers},
+    components: {ApiDocument, AppMenu, PolygonLayer, LayerList, PointLayers, LineLayers},
     data() {
       return {
         map: undefined,
@@ -72,8 +82,8 @@
       menuChange(menu) {
         this.menu = menu;
       },
-      onDrawerClose(){
-        this.menu=null;
+      onDrawerClose() {
+        this.menu = null;
       }
     },
     beforeDestroy() {
@@ -109,8 +119,7 @@
     }
 
     & /deep/ .ant-menu-inline-collapsed > .ant-menu-item,
-    & /deep/ .ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title
-    {
+    & /deep/ .ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title {
       padding: 0 10px !important;
     }
   }

@@ -1,43 +1,26 @@
 <template>
   <div>
     <a-collapse accordion v-model="activeKey">
-      <a-collapse-panel header="图层数据" key="1" :disabled="false">
-        <p>定义数据属性</p>
-        <div>
-          <a-button @click="propertyModalVisible=true">添加属性</a-button>
-        </div>
-        <a-table :columns="propertyColumns"
-                 :dataSource="properties"
-                 :scroll="{ y: 320 }"
-                 :rowKey="record=>record.name"
-                 :pagination="false" size="small">
-          <div slot="action" slot-scope="text, record">
-            <a-popover title="确定删除吗?"
-                       trigger="focus"
-                       placement="right">
-              <template slot="content">
-                <div class="d-symmetry">
-                  <a-button size="small" type="primary"
-                            @click="deleteProperty(record)">确定
-                  </a-button>
-                  <a-button size="small">取消</a-button>
-                </div>
-              </template>
-              <a-button type="danger" shape="circle" icon="delete"></a-button>
-            </a-popover>
-          </div>
-        </a-table>
-        <a-button @click="makeData">生成数据</a-button>
-        <p>数据预览</p>
-        <a-textarea placeholder="数据预览" v-model="layerDataString" :rows="4"/>
+      <a-collapse-panel header="图层数据" key="1">
+        <a-form layout="inline">
+          <a-form-item label="数据规模">
+            <a-input-number
+                v-model="count"
+                :min="1" :max="30"></a-input-number>
+          </a-form-item>
+          <a-form-item>
+            <a-button type="primary"
+                      @click="makeData">生成
+            </a-button>
+          </a-form-item>
+        </a-form>
+        <p style="margin-top: 16px;">代码预览</p>
+        <a-textarea placeholder="代码预览"
+                    v-model="layerDataString" :rows="10"
+                    aria-readonly="true"/>
       </a-collapse-panel>
       <a-collapse-panel header="图层样式" key="2">
         <a-form>
-          <a-form-item :label-col="labelCol" :wrapper-col="wrapperCol" label="圆点个数">
-            <a-input-number
-                v-model="count"
-                :min="1" :max="20"></a-input-number>
-          </a-form-item>
           <a-form-item :label-col="labelCol" :wrapper-col="wrapperCol" label="填充颜色">
             <el-color-picker size="small"
                              v-model="option.paint['circle-color']"></el-color-picker>
@@ -69,22 +52,23 @@
                       v-model="option.paint['circle-blur']"/>
           </a-form-item>
         </a-form>
+        <p style="margin-top: 16px;">代码预览</p>
+        <a-textarea placeholder="代码预览"
+                    v-model="layerOptionsString" :rows="10"
+                    aria-readonly="true"/>
       </a-collapse-panel>
     </a-collapse>
 
     <div class="d-bottom-button">
+      <a-button type="danger" style="margin-right: 16px;"
+                :disabled="layers.length==0"
+                @click="clearPointLayer">
+        清空图层
+      </a-button>
       <a-button type="primary" @click="addPointLayer">
         添加图层
       </a-button>
     </div>
-    <a-modal title="添加属性" v-model="propertyModalVisible"
-             @ok="addProperty">
-      <a-form>
-        <a-form-item :label-col="labelCol" :wrapper-col="wrapperCol" label="属性名称">
-          <a-input v-model="property.name" required="true"></a-input>
-        </a-form-item>
-      </a-form>
-    </a-modal>
   </div>
 </template>
 
@@ -99,7 +83,6 @@
     data() {
       return {
         activeKey: '1',
-        propertyModalVisible: false,
         count: 1,
         option: {
           "type": constant.layerType.CIRCLE,
@@ -127,18 +110,25 @@
             scopedSlots: {customRender: 'action'},
           },
         ],
-        property: {name: ''},
-        properties: [],
-        layerData: [],
+        layerData: null,
+        layers: []
       }
     },
     computed: {
       layerDataString() {
+        if (!this.layerData) return "";
         return JSON.stringify(this.layerData);
+      },
+      layerOptionsString() {
+        return JSON.stringify(this.option);
       }
     },
     methods: {
       addPointLayer() {
+        if (!this.layerData || this.layerData.length == 0) {
+          this.$message.warning("请先生成图层数据");
+          return;
+        }
         let now = new Date().getTime();
         let [sourceId, layerId] =
             ['source_point_' + now, 'layer_point_' + now];
@@ -148,11 +138,11 @@
           id: layerId,
           source: sourceId
         }, this.option);
-        let data = getPointObjs(this.map.getCenter(), this.count);
+        let data = this.layerData;
         let coordinateFieldName = 'coordinates';
         let geometryType = constant.geometryType.POINT;
         let properties = [];
-        let err = mapTools.addLayer(this.map,
+        let err = mapTools.addLayerWithUntreatedData(this.map,
             {data, coordinateFieldName, geometryType, properties}, option);
         if (err) {
           this.$message.error("错误：" + err);
@@ -161,40 +151,30 @@
         if (this.map.getZoom() < 13) {
           this.map.setZoom(13);
         }
-        this.$eBus.$emit('add-layer', {
+        // this.$eBus.$emit('add-layer', {
+        //   name: '点图层_' + now,
+        //   sourceId: sourceId,
+        //   layerId: layerId,
+        //   show: true,
+        //   color: this.option.paint["circle-color"]
+        // });
+        this.layers.push({
           name: '点图层_' + now,
           sourceId: sourceId,
           layerId: layerId,
           show: true,
           color: this.option.paint["circle-color"]
+        })
+      },
+      clearPointLayer() {
+        this.layers.forEach(e => {
+          mapTools.removeLayer(this.map, e.layerId);
+          mapTools.removeSource(this.map, e.sourceId);
         });
-      },
-      addProperty() {
-        if (!this.property.name) {
-          this.$message.warning("请输入属性名称");
-          return;
-        }
-        this.properties.push(Object.assign({}, this.property));
-        this.property.name = '';
-      },
-      deleteProperty(v) {
-
+        this.layers = [];
       },
       makeData() {
-        if (this.properties.length == 0) {
-          this.$message.warning("请添加属性");
-          return;
-        }
-        this.layerData = [];
-        let zb = getPointObjs(this.map.getCenter(), 10);
-        for (let i = 0; i < 10; i++) {
-          let obj = {};
-          this.properties.forEach(p => {
-            obj[p.name] = '随机的属性值' + new Date().getTime();
-          });
-          obj.zb = zb[i].coordinates;
-          this.layerData.push(obj);
-        }
+        this.layerData = getPointObjs(this.map.getCenter(), this.count);
       }
     }
   }

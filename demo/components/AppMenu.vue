@@ -20,6 +20,10 @@
         <a-menu-item key="layer:line">线图层</a-menu-item>
         <a-menu-item key="layer:fill">面图层</a-menu-item>
       </a-sub-menu>
+      <a-menu-item key="api">
+        <a-icon :type="toggleIconType"/>
+        <span>api文档</span>
+      </a-menu-item>
     </a-menu>
   </div>
 </template>

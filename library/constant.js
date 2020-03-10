@@ -1,6 +1,10 @@
 /**
  * 常量
  * */
+
+export const error={
+  NO_MAP:'地图对象不存在',
+};
 export const geometryType = {
   POINT: "Point",
   MULTI_POINT: "MultiPoint",
@@ -181,4 +185,5 @@ export default {
   geometryType,
   layerType,
   geoJsonDataType,
+  error
 };
