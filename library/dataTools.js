@@ -134,15 +134,7 @@ export const polygonStringToArray = function (polygonString) {
   }
 };
 export const getGeoJsonFromUntreatedData = function (params) {
-  let data;
-  let source = params.data;
-  if (source instanceof Array) {
-    let features = getFeatures(params);
-    data = new myClass.FeatureCollection(features);
-  } else {
-    data = getFeature(params);
-  }
-  return new myClass.GeoJson(data);
+  return new myClass.GeoJson(getSourceData(params));
 };
 export const getGeoJsonByFeature = function (feature) {
   return new myClass.GeoJson(feature);
@@ -152,7 +144,17 @@ export const getGeoJsonByFeatures = function (features) {
   data.features = features;
   return new myClass.GeoJson(data);
 };
-
+export const getSourceData = function (params) {
+  let source = params.data;
+  let data;
+  if (source instanceof Array) {
+    let features = getFeatures(params);
+    data = new myClass.FeatureCollection(features);
+  } else {
+    data = getFeature(params);
+  }
+  return data;
+};
 export default {
   getFeature,
   getFeatures,
@@ -161,5 +163,6 @@ export default {
   getGeoJsonFromUntreatedData,
   pointStringToArray,
   lineStringToArray,
-  polygonStringToArray
+  polygonStringToArray,
+  getSourceData
 }

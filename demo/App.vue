@@ -18,7 +18,7 @@
         @close="onDrawerClose"
         :mask="false"
         :visible="menu=='layer:symbol'">
-      <div>111</div>
+      <symbol-layer :map="map"></symbol-layer>
     </a-drawer>
     <a-drawer
         title="线图层"
@@ -58,10 +58,14 @@
   import PolygonLayer from "./components/PolygonLayer";
   import AppMenu from "./components/AppMenu";
   import ApiDocument from "./components/ApiDocument";
+  import mapTools from "../library/mapTools";
+  import iconCrossingJudged from '../public/images/icon-crossing-judged.png'
+  import SymbolLayer from "./components/SymbolLayer";
+  import mapConfig from '../public/config'
 
   export default {
     name: "App",
-    components: {ApiDocument, AppMenu, PolygonLayer, LayerList, PointLayers, LineLayers},
+    components: {SymbolLayer, ApiDocument, AppMenu, PolygonLayer, LayerList, PointLayers, LineLayers},
     data() {
       return {
         map: undefined,
@@ -72,12 +76,25 @@
     },
     computed: {
       mapConfig() {
-        return window.mapConfig;
+        // return window.mapConfig;
+        return mapConfig;
       }
     },
     methods: {
       mapLoad(map) {
         this.map = map;
+        map.loadImage(iconCrossingJudged, function (error, image) {
+          if (error) throw error;
+          map.addImage('icon-crossing-judged', image);
+        });
+        mapTools.addLayer(map, mapTools.getGeoJsonByFeatures([]), {
+          id: 'layer1999',
+          source: 'source1999',
+          type: 'symbol',
+          layout: {
+            "icon-image": 'icon-crossing-judged'
+          }
+        });
       },
       menuChange(menu) {
         this.menu = menu;

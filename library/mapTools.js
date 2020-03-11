@@ -1,5 +1,12 @@
-import {getFeature,getGeoJsonFromUntreatedData} from "./dataTools";
+import {
+  getFeature,
+  getGeoJsonFromUntreatedData,
+  getGeoJsonByFeatures,
+  getGeoJsonByFeature,
+  getFeatures, getSourceData
+} from "./dataTools";
 import {geometryType, layerType} from "./constant";
+import myClass, {FeatureCollection} from "./myClass";
 
 /**
  *
@@ -32,17 +39,19 @@ export const addLayer = function (map, geoJson, layerOptions) {
 };
 export const updateSourceDataWithUntreatedData = function (map, sourceId, dataParams) {
   if (!map) return;
-  let geoJson = getGeoJsonFromUntreatedData(dataParams);
-  if (!geoJson) {
-    return;
-  }
-  updateSourceData(map, sourceId, geoJson);
+  updateSourceData(map, sourceId, getSourceData(dataParams));
 };
-export const updateSourceData = function (map, sourceId, geoJson) {
+export const updateSourceData = function (map, sourceId, data) {
   if (!map) return;
   let source = map.getSource(sourceId);
   if (!source) return;
-  source.setData(geoJson);
+  source.setData(data);
+};
+export const clearSourceDate = function (map, sourceId) {
+  if (!map) return;
+  let source = map.getSource(sourceId);
+  if (!source) return;
+  source.setData(new FeatureCollection([]));
 };
 const addSimpleMarker = function (map, point, icon, options) {
   let op = {map: map, position: point, icon: icon};
@@ -94,4 +103,7 @@ export default {
   removeSource,
   updateSourceData,
   updateSourceDataWithUntreatedData,
+  getGeoJsonByFeatures,
+  getSourceData,
+  clearSourceDate
 };

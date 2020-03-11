@@ -12,6 +12,12 @@ Vue.use(Antd);
 Vue.component(ColorPicker.name, ColorPicker);
 Vue.use(MapView);
 Vue.prototype.$eBus=new Vue();
+String.prototype.toPoint=function (reg) {
+  if (!reg && reg !== ' ') reg = ' ';
+  if (!this || this.indexOf(reg) <= 0) return null;
+  let arr = this.split(reg);
+  return [parseFloat(arr[0]), parseFloat(arr[1])];
+};
 new Vue({
   render: h => h(App),
 }).$mount('#app')
