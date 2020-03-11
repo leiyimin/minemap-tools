@@ -1,36 +1,19 @@
- import constant from "./constant";
+import constant from "./constant";
 import myClass from "./myClass";
 
-/**
- *
- * @param objArray (Array required)
- *        数据集合
- * @param type (String required)
- *        要素类型
- * @param coordinateFieldName (String required)
- *        数据对象中坐标字段名称
- * @param properties (Array)
- *        要拷贝到feature的属性名集合,
- *        空数组代表拷贝所有属性,
- *        不传默认不拷贝属性.
- * @return
- */
 export const getFeatures = function (params) {
   let features = [];
   params.data.forEach(obj => {
     let feature = getFeature(Object.assign(params, {data: obj}));
-    if (typeof feature === 'string') {
-      return feature;
-    }
-    features.push(feature);
+    if (feature)
+      features.push(feature);
   });
   return features;
 };
-
 export const getFeature = function (params) {
   let dataObj = params.data;
   let type = params.geometryType;
-  let coordinateFieldName = params.coordinateFieldName||'coordinates';
+  let coordinateFieldName = params.coordinateFieldName || 'coordinates';
   let properties = params.properties;
   const geometryType = constant.geometryType;
   // let feature = Object.assign({}, constant.featureTemplate);
@@ -61,25 +44,25 @@ export const getFeature = function (params) {
         break;
     }
     if (!coordinates || !(coordinates instanceof Array)) {
-      return '坐标数据格式错误';
+      return null;
     }
     feature.geometry.coordinates = coordinates;
   } else {
-    return '坐标数据类型错误';
+    return null;
   }
   //处理properties
-  if (!properties||properties.length>0) {
+  if (!properties || properties.length > 0) {
     let prop = {};
-    if (properties.length > 0) {
-      properties.forEach(key => {
-        prop[key] = dataObj[key];
-      })
-    } else {
+    if (!properties) {
       Object.keys(dataObj).forEach(key => {
         if (key != coordinateFieldName) {
           prop[key] = dataObj[key];
         }
       });
+    } else {
+      properties.forEach(key => {
+        prop[key] = dataObj[key];
+      })
     }
     feature.properties = prop;
   }
@@ -158,9 +141,6 @@ export const getGeoJsonFromUntreatedData = function (params) {
     data = new myClass.FeatureCollection(features);
   } else {
     data = getFeature(params);
-  }
-  if (typeof data === 'string') {
-    return data;
   }
   return new myClass.GeoJson(data);
 };

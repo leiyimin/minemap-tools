@@ -37,17 +37,24 @@
 
       </a-col>
     </a-row>
-    <div style="margin-top: 64px">
+    <div class="d-bottom-button">
+      <a-button type="danger" style="margin-right: 16px;"
+                :disabled="layers.length==0"
+                @click="clearLayer">
+        清空图层
+      </a-button>
       <a-button @click="addLayer"
                 type="primary"
-                style="float: right;">添加面图层
+                style="float: right;">添加图层
       </a-button>
     </div>
+
   </div>
 </template>
 
 <script>
   import mapTools from "../../index";
+  import {getPolygonObjs} from "../script/public";
 
   export default {
     name: "PolygonLayer",
@@ -55,8 +62,10 @@
     data() {
       return {
         count: 1,
-        vertexNum: 4,
+        vertexNum: 3,
+        layers: [],
         option: {
+          type: mapTools.layerType.FILL,
           paint: {
             'fill-color': '#6c34ff',
             'fill-opacity': 0.4,
@@ -69,17 +78,20 @@
       addLayer() {
         let now = new Date().getTime();
         let [sourceId, layerId] =
-            ['source_point_' + now, 'layer_point_' + now];
-        let err = mapTools.createPolygonLayer(this.map, sourceId, layerId,
-            this.getCoordinates(), this.option);
-        if (err) {
-          this.$message.error("错误：" + err);
-          return;
-        }
+          ['source_fill_' + now, 'layer_fill_' + now];
+        let option = Object.assign({
+          id: layerId,
+          source: sourceId
+        }, this.option);
+        let data = getPolygonObjs(this.map.getCenter(), this.count,this.vertexNum);
+        let coordinateFieldName = 'coordinates';
+        let geometryType = mapTools.geometryType.POLYGON;
+        mapTools.addLayerWithUntreatedData(this.map,
+          {data, coordinateFieldName, geometryType}, option);
         if (this.map.getZoom() < 13) {
           this.map.setZoom(13);
         }
-        this.$eBus.$emit('add-layer', {
+        this.layers.push({
           name: '面图层_' + now,
           sourceId: sourceId,
           layerId: layerId,
@@ -87,24 +99,13 @@
           color: this.option.paint["fill-color"]
         });
       },
-      getCoordinates() {
-        let point = this.map.getCenter();
-        let max = 10;
-        let min = 1;
-        let polygons = [];
-        for (let i = 0; i < this.count; i++) {
-          let polygon = [];
-          for (let j = 0; j < this.vertexNum; j++) {
-            let random1 = (Math.random() * (max - min + 1) + min) / 1000;
-            let random2 = (Math.random() * (max - min + 1) + min) / 1000;
-            let vertex = [point.lng + random1, point.lat + random2];
-            polygon.push(vertex);
-          }
-          polygon.push(polygon[0]);
-          polygons.push([polygon]);
-        }
-        return polygons;
-      }
+      clearLayer() {
+        this.layers.forEach(e => {
+          mapTools.removeLayer(this.map, e.layerId);
+          mapTools.removeSource(this.map, e.sourceId);
+        });
+        this.layers = [];
+      },
     }
   }
 </script>

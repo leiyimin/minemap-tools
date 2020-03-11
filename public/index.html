@@ -6,8 +6,21 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
-    <link rel="stylesheet" href="lib/minemap/minemap.css">
-    <script src="lib/minemap/minemap.js"></script>
+    <style>
+      .d-bottom-button {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        border-top: 1px solid #e8e8e8;
+        padding: 10px 16px;
+        text-align: right;
+        left: 0;
+        background: #fff;
+        border-radius: 0 0 4px 4px;
+      }
+    </style>
+    <link rel="stylesheet" href="//minedata.cn/minemapapi/v2.0.0/minemap.css">
+    <script src="//minedata.cn/minemapapi/v2.0.0/minemap.js"></script>
     <script src="config.js"></script>
   </head>
   <body>

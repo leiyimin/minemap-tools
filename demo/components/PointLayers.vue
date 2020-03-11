@@ -74,8 +74,7 @@
 
 <script>
   import mapTools from "../../index";
-  import {getPointObjs} from "../js/public";
-  import constant from "../../library/constant";
+  import {getPointObjs} from "../script/public";
 
   export default {
     name: "PointLayers",
@@ -85,7 +84,7 @@
         activeKey: '1',
         count: 1,
         option: {
-          "type": constant.layerType.CIRCLE,
+          "type": mapTools.layerType.CIRCLE,
           "paint": {
             "circle-color": "#ff0000", //圆的填充颜色，默认值为#000000，值类型为color字符串
             "circle-radius": 15, //圆半径，默认值为5，值类型为number，单位是像素
@@ -132,32 +131,19 @@
         let now = new Date().getTime();
         let [sourceId, layerId] =
             ['source_point_' + now, 'layer_point_' + now];
-        // let err = mapTools.createPointLayer(this.map, sourceId, layerId,
-        //   this.getPointCoordinates(this.map.getCenter(), this.count || 3), this.option);
         let option = Object.assign({
           id: layerId,
           source: sourceId
         }, this.option);
         let data = this.layerData;
         let coordinateFieldName = 'coordinates';
-        let geometryType = constant.geometryType.POINT;
+        let geometryType = mapTools.geometryType.POINT;
         let properties = [];
-        let err = mapTools.addLayerWithUntreatedData(this.map,
+        mapTools.addLayerWithUntreatedData(this.map,
             {data, coordinateFieldName, geometryType, properties}, option);
-        if (err) {
-          this.$message.error("错误：" + err);
-          return;
-        }
         if (this.map.getZoom() < 13) {
           this.map.setZoom(13);
         }
-        // this.$eBus.$emit('add-layer', {
-        //   name: '点图层_' + now,
-        //   sourceId: sourceId,
-        //   layerId: layerId,
-        //   show: true,
-        //   color: this.option.paint["circle-color"]
-        // });
         this.layers.push({
           name: '点图层_' + now,
           sourceId: sourceId,
@@ -181,15 +167,5 @@
 </script>
 
 <style scoped>
-  .d-bottom-button {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    border-top: 1px solid #e8e8e8;
-    padding: 10px 16px;
-    text-align: right;
-    left: 0;
-    background: #fff;
-    border-radius: 0 0 4px 4px;
-  }
+
 </style>
